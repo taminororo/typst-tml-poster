@@ -1,0 +1,13 @@
+# Compiled output (except examples/)
+*.pdf
+!examples/*.pdf
+
+# macOS
+.DS_Store
+
+# Typst cache
+.typst/
+
+# Editor
+.vscode/settings.json
+*.swp
