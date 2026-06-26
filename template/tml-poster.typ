@@ -155,39 +155,39 @@
 #let _make-header(title, subtitle, authors, affil) = block(
   width: 100%,
   fill: tml-blue,
-  inset: (x: 2cm, top: 1.2cm, bottom: 0cm),
+  inset: (x: 2cm, top: 1.0cm, bottom: 0cm),
   stack(
     grid(
-      columns: (13cm, 1fr, 13cm),
-      column-gutter: 1.2cm,
+      columns: (9cm, 1fr, 9cm),
+      column-gutter: 1.0cm,
       align: horizon,
-      logo-card("../assets/logo-nut-white.png", bg: none),
+      logo-card("../assets/logo-nut-white.png", bg: none, card-height: 6.5cm, card-width: 9cm),
       align(center)[
-        #text(size: 50pt, weight: "bold", fill: white, title)
-        #v(0.35cm)
-        #text(size: 28pt, fill: rgb("#ccd6ee"), subtitle)
+        #text(size: 40pt, weight: "bold", fill: white, title)
         #v(0.3cm)
-        #text(size: 28pt, fill: white, authors)
-        #v(0.2cm)
-        #text(size: 23pt, fill: rgb("#a0b4cc"), affil)
+        #text(size: 22pt, fill: rgb("#ccd6ee"), subtitle)
+        #v(0.25cm)
+        #text(size: 23pt, fill: white, authors)
+        #v(0.15cm)
+        #text(size: 18pt, fill: rgb("#a0b4cc"), affil)
       ],
-      logo-card("../assets/logo-tml-white.png", bg: none),
+      logo-card("../assets/logo-tml-white.png", bg: none, card-height: 6.5cm, card-width: 9cm),
     ),
-    v(1cm),
-    block(width: 100%, height: 0.6cm, fill: tml-accent),
+    v(0.7cm),
+    block(width: 100%, height: 0.5cm, fill: tml-accent),
   ),
 )
 
 #let _make-footer(conf, contact, funding) = block(
   width: 100%,
   fill: tml-blue,
-  inset: (x: 2cm, y: 0.8cm),
+  inset: (x: 2cm, y: 0.7cm),
   grid(
     columns: (1fr, 1fr, 1fr),
     align: horizon,
-    text(fill: white, size: 22pt, conf),
-    align(center, text(fill: white, size: 22pt, contact)),
-    align(right, text(fill: rgb("#a0b4cc"), size: 20pt, funding)),
+    text(fill: white, size: 18pt, conf),
+    align(center, text(fill: white, size: 18pt, contact)),
+    align(right, text(fill: rgb("#a0b4cc"), size: 16pt, funding)),
   ),
 )
 
@@ -207,8 +207,8 @@
   let ftr = _make-footer(conf, contact, funding)
 
   set page(
-    width: 84.1cm,
-    height: 118.9cm,
+    width: 59.4cm,
+    height: 84.1cm,
     margin: (top: 0pt, bottom: 0pt, left: 0pt, right: 0pt),
     header: none,
     footer: none,
@@ -216,7 +216,7 @@
   set text(
     font: ("Noto Sans CJK JP", "Hiragino Sans", "Yu Gothic",
            "New Computer Modern"),
-    size: 26pt,
+    size: 22pt,
     lang: "ja",
     fill: tml-text,
   )
@@ -224,7 +224,7 @@
   set math.equation(numbering: none)
   show math.equation: set text(font: ("New Computer Modern Math",
                                        "New Computer Modern"))
-  show figure.caption: set text(size: 20pt, fill: tml-gray)
+  show figure.caption: set text(size: 16pt, fill: tml-gray)
   set figure(supplement: [図])
 
   place(top + left, hdr)
@@ -232,7 +232,7 @@
 
   block(
     width: 100%,
-    inset: (x: 2cm, top: 14.5cm, bottom: 4.8cm),
+    inset: (x: 2cm, top: 10.8cm, bottom: 3.8cm),
     body,
   )
 }

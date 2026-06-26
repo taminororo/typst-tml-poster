@@ -18,15 +18,14 @@
 // section(タイトル, 内容, accent: true) → アクセントカラーのバー
 // 上から左→右の順でセルが埋まります。
 // ────────────────────────────────────────────────────────────────────
+// フローモード（左右カラムが独立した高さ）。左=背景→問題→提案、右=主結果→補助→まとめ。
 #poster-body(
-  // 行1
-  section[研究背景][#sec-background],
-  section[提案手法][#sec-method],
-
-  // 行2
-  section[実験設定][#sec-experiment],
-  section[実験結果][#sec-results],
-
-  // 行3：全幅・アクセントカラー
-  section([まとめ & 今後の課題], sec-conclusion, span: 2, accent: true),
+  flow: true,
+  // 左カラム                          // 右カラム
+  section([1. 研究背景と目的], sec-background),
+  section([4. 主結果：seed 普遍な解釈軸 ★], sec-results, accent: true),
+  section([2. 問題：軸の向きが seed でバラつく], sec-problem),
+  section([5. 補助検証：量の単調性と汎化], sec-aux),
+  section([3. 提案：整合損失（align loss）★], sec-method, accent: true),
+  section([6. 限界と今後／まとめ ★], sec-conclusion, accent: true),
 )
