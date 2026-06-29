@@ -1,88 +1,90 @@
 // ======================================================================
 // content.typ — ★ここだけ書き換えればポスターが完成します
-// 内容の出所: digress-research/docs/ポスター本文_2026-06-26.md（検証済み数値）
+// 文面の出所（唯一の正）:
+//   digress-research/docs/ポスター本文_2026-06-26.md
+//   digress-research/docs/ポスター設計_2026-06-26.md
+// 用語厳守: 「整合損失」の語は使わず機能で記述（横軸を通信量変化に整合させる補助損失）。
+//   η²=0.77 は型分離、Spearman 0.73 は nc 相関（混同しない）。λ は値を断定せず「係数 λ で調整」。
 // ======================================================================
 #import "template/tml-poster.typ": highlight-box
-#import "template/colors.typ": tml-gray, tml-accent, tml-blue, tml-light
+#import "template/colors.typ": tml-gray, tml-accent, tml-blue, tml-light, tml-text
 
 // ── メタ情報 ──────────────────────────────────────────────────────────
 
-#let poster-title    = [潜在空間の軸に「意味」を立てる]
-#let poster-subtitle = [整合損失で「通信量の変化」を seed 普遍に固定する — GraphVAE 組織グラフの解釈軸を 10 seed で安定化し、潜在のまま読む課題へ]
+#let poster-title    = [Slack ログから構築したコミュニケーショングラフに対する GraphVAE の潜在表現の解釈]
+#let poster-subtitle = [横軸を「通信量の変化」に揃える補助損失で解釈軸を 10 seed にわたり安定化する。あわせて残る縦軸が表す構造と、潜在表現を保ったまま解釈するという課題を述べる。]
 #let poster-authors  = [上林 英佑]
 #let poster-affil    = [情報・経営システム工学分野 B4 ／ 機械学習理論研究室（TML）／ 指導教員: 雲居 玄道 ／ 学籍番号 23103285]
 #let poster-conf     = [機械学習理論研究室（TML）学内ポスター発表]
-#let poster-contact  = [上林 英佑（学籍番号 23103285）・指導教員: 雲居 玄道]
-#let poster-funding  = [整合損失 (align loss) ／ GraphVAE 潜在空間の解釈軸]
+#let poster-contact  = [上林 英佑（学籍番号 23103285）]
+#let poster-funding  = [GraphVAE 組織グラフ ／ 潜在軸の解釈]
 
-// ── 3連スタッツ（keybox）コンポーネント ──────────────────────────────
+// ── 部品 ──────────────────────────────────────────────────────────────
+
+// 各パネル冒頭のテイクアウェイ（遠目で残す1行）
+#let lead(body) = block(
+  below: 0.5cm,
+  text(weight: "bold", fill: tml-blue, size: 23pt, body),
+)
+
+// 主結果の3連スタッツ
 #let stat-box(value, label) = block(
   width: 100%,
   fill: tml-light,
-  inset: (x: 8pt, y: 7pt),
+  inset: (x: 8pt, y: 9pt),
   stroke: (top: (thickness: 3pt, paint: tml-accent)),
   align(center + horizon)[
-    #text(size: 24pt, weight: "bold", fill: tml-accent)[#value]
+    #text(size: 26pt, weight: "bold", fill: tml-accent)[#value]
     #v(0.15cm)
-    #text(size: 15pt, fill: tml-gray)[#label]
+    #text(size: 16pt, fill: tml-gray)[#label]
   ],
 )
 
 // ── セクション内容 ────────────────────────────────────────────────────
 
-// Card 1: 研究背景と目的
+// パネル1: 研究背景と目的
 #let sec-background = [
-  組織の *Slack 通信グラフ* を GraphVAE で 2 次元の潜在ベクトル $bold(z)_g = (z_x, z_y)$ に圧縮する。
-  狙いは潜在空間で *「この方向に進むとこういう組織になる、どっちに行きたいか」* を示すこと
-  （若月研究の「理想組織へ向かえ」を、*方向そのものに意味* を持たせる形へ）。それには軸が seed で安定して解釈できる必要がある。
-
-  *なぜ潜在空間のままか:* 新組織ではどの軸（特徴）が効くか事前に分からない。
-  だから手で特徴を選ぶ *陽な空間* でなく、データから軸を学ぶ *潜在空間* にしておきたい。
-
-  #text(size: 16pt, fill: tml-gray)[
-    *入力:* ノード＝メンバー（学年/役割つき）、エッジ＝2人間の通信量。
-    base 33 件（実組織 28 ＋ 理想型 5）＋ 通信量を増減した UP/DOWN 拡張（$N=1\~7$）。
-  ]
-
   #highlight-box[
-    *問い:* 潜在軸の「方向＝意味」は、乱数 seed を変えても安定して成り立つか？
+    *潜在軸における「方向」と「意味」の対応は、学習の乱数 seed に対して安定に成り立つか。*
   ]
+
+  - 組織の Slack 通信グラフを GraphVAE により 2 次元の潜在ベクトル $z_g = (z_x, z_y)$ へ符号化し、潜在空間上の移動方向に組織変化の意味を対応づけ、組織が遷移しうる方向を提示することを目指す。
+  - 潜在表現を用いるのは、未知の組織でどの特徴量が重要かを事前に定められず、人手設計の陽な表現よりも、データから学習される潜在表現が適するためである。
+  - 入力はノードを各メンバー（学年・役割付与）、エッジを 2 者間の通信量とするグラフで、実組織 28 件と理想型 5 件を基本とする。各基本グラフから一部エッジの通信量を一定量ずつ増減させた拡張グラフを学習データに加える（増減操作と量 $N$ は 2 節）。
 ]
 
-// Card 2: 問題提起（seed で軸がバラバラ）
+// パネル2: 問題（図なし・数値で述べる）
 #let sec-problem = [
-  *UP / DOWN 拡張*（通信を増減したグラフ）の潜在移動の *向き（角度）* を測る。
-  当初は「seed ごとの回転だけ」と思ったが、実際は *ばらつき自体が大きく方向＝意味が成立しない*。
+  #lead[移動方向の seed 間のばらつきは 60〜99° に達し、方向と意味の対応が成立しない。]
 
-  #figure(
-    image("assets/seed_compare.png", width: 70%),
-    caption: [*10 seed の潜在空間 $bold(z)_g$*。★=元グラフ、点=拡張（色=元組織）。配置・向きが seed ごとに変わる。],
-  )
-
-  baseline の向きの seed 間ばらつき（円周標準偏差）は組織により *60〜99°* で、「方向＝意味」が立たない。
-  #text(size: 16pt, fill: tml-gray)[*$N$:* 通信量を増減した本数。UP=$+N$, DOWN=$-N$。]
+  - UP/DOWN 拡張（通信量を増減したグラフ）の、潜在空間上での移動方向（角度）を測定する。
+  - 潜在空間の回転自由度のみであれば相対的な向きは保たれるが、実測では向き自体が seed 間で *60〜99°*（円周標準偏差）ばらついた。
+  - $N$ は通信量を一定量ずつ増減させたエッジの本数であり、連続な通信量を離散ステップで操作したものである（UP $= +N$、DOWN $= -N$）。
+  - 各 seed・各理想型について UP 拡張の移動方向の角度を求め、その seed 間ばらつき（円周標準偏差）が *60〜99°* に達することを確認した。
 ]
 
-// Card 3: 提案手法（整合損失）
+// パネル3: 提案（全幅・数式）
 #let sec-method = [
-  各グラフに *符号付き変化量* $t$（UP は $+N$, DOWN は $-N$, 元組織は $0$）を与え、
-  横軸 $z_x$ と $t$ の *Pearson 相関* $rho_"align"$ を最大化する損失を 1 本足して *学習し直す*。
+  #lead[横軸 $z_x$ と符号付き変化量 $N$ の相関を最大化する補助項を損失に導入する。]
 
-  $ cal(L)_"align" = - rho_"align"(z_x, t), quad cal(L)_"total" = cal(L)_"rec" + beta cal(L)_"KL" + lambda cal(L)_"align" $
+  $ cal(L)_"align" = - rho(z_x, t), quad t = plus.minus N $
 
-  *MSE でなく相関* なのは、VAE の KL が潜在スケールを縮めるため「順序・向き」だけ要求すれば衝突しにくいから。拘束は横軸 $z_x$ のみ、係数 $lambda$ で調整。
-
-  #text(size: 15pt, fill: tml-gray)[実装: `compute_align_loss()`, `train.py:133–150 @cedb973`]
+  - 各グラフに符号付き変化量 $t$（UP $= +N$、DOWN $= -N$、原本 $= 0$）を付与する。
+  - 横軸 $z_x$ と $t$ の Pearson 相関を最大化する項を、補助項として損失に加える。
+  - 二乗誤差でなく相関を用いるのは、VAE の KL 項が潜在スケールを縮小するため、絶対値でなく順序と向きのみを要求する形が再構成項・KL 項と両立しやすいことによる。拘束は横軸 $z_x$ に限り、係数 $lambda$ で調整する。
 ]
 
-// Card 4: 主結果（本丸）
+// パネル4: 主結果（全幅・表＋3スタッツ）
 #let sec-results = [
-  整合損失で 10 seed 再学習すると *2 つが同時に起きる*：
-  (1) 横軸 $z_x$ と符号付き $N$ の相関 $rho_x$ が上がる＝*横軸が解釈可能に*、
-  (2) seed 毎の向きの標準偏差が下がる＝*方向＝意味が安定に近づく*。疎な 4 組織 × 10 seed。
+  #lead[全 10 seed で $rho_x$ は約 0 から 0.9 へ向上し、移動方向のばらつきは 60〜99° から 14〜25° へ縮小する。]
 
+  - $rho_x$（横軸 $z_x$ と符号付き $N$ の相関）は、x 軸が通信量変化に連動する度合いを表す。
+  - baseline の 0.0〜0.4 から補助損失により *0.88〜0.95* へ向上し、全 10 seed で符号が一致する。再構成性能の劣化は認められない。
+
+  #v(0.2cm)
+  // ── ρ_x 表（半幅・全カラム幅）──
   #table(
-    columns: (1.5fr, 1fr, 1fr, 1.4fr),
+    columns: (auto, 1fr, 1fr, 1.1fr),
     inset: (x: 8pt, y: 7pt),
     align: (left, center, center, center),
     stroke: (paint: tml-blue, thickness: 0.6pt),
@@ -91,10 +93,10 @@
       else if calc.odd(row) { tml-light }
       else { white },
     table.header(
-      text(fill: white, weight: "bold", size: 18pt)[組織構造],
-      text(fill: white, weight: "bold", size: 18pt)[baseline $rho_x$],
-      text(fill: white, weight: "bold", size: 18pt)[align $rho_x$],
-      text(fill: white, weight: "bold", size: 18pt)[角度 std\ base→align],
+      text(fill: white, weight: "bold", size: 17pt)[組織構造],
+      text(fill: white, weight: "bold", size: 17pt)[baseline $rho_x$],
+      text(fill: white, weight: "bold", size: 17pt)[align $rho_x$],
+      text(fill: white, weight: "bold", size: 17pt)[角度 std\ base→align],
     ),
     [modular],      [+0.34], text(fill: tml-accent, weight: "bold")[+0.95], [60°→25°],
     [hub],          [+0.40], text(fill: tml-accent, weight: "bold")[+0.94], [73°→19°],
@@ -102,45 +104,43 @@
     [mentorship],   [+0.08], text(fill: tml-accent, weight: "bold")[+0.91], [99°→17°],
   )
 
-  #v(0.2cm)
+  #v(0.3cm)
+  // ── 3スタッツ（表の下に横並び）──
   #grid(
     columns: (1fr, 1fr, 1fr),
     column-gutter: 0.4cm,
-    stat-box([10/10], [全 seed で $rho_x > 0$・符号統一]),
-    stat-box([0.88–0.95], [align $rho_x$（理想型4種）]),
-    stat-box([60–99°→14–25°], [向きの seed ばらつき縮小]),
+    stat-box([10/10], [全 seed で $rho_x > 0$・符号一致]),
+    stat-box([0.88–0.95], [align の $rho_x$（理想型 4 種）]),
+    stat-box([60–99° → 14–25°], [向きの seed 間ばらつき縮小]),
   )
+
+  #v(0.2cm)
+  - 完全グラフ K_10 では整合が達成されない。学習データが疎な実組織に限られ、K_10 が分布外（OOD）となるためと考えられる。
 ]
 
-// Card 5: y軸の解釈（固定後の縦軸は何か）
+// パネル5: y軸の解釈（図 zy_by_type）
 #let sec-zy = [
-  x軸固定後、残る y軸 $z_y$ を *理想組織グラフ* で構造指標と相関させると、
-  *コミュニティ数（サブチームの数）* と最もよく相関（Spearman 0.73、hub 除外 0.63、x軸対照 0.19 ≪ 0.73）。5 理想型を分離（型分離 $eta^2 = 0.77$）。
+  #lead[縦軸はサブチームの個数（統合と分断）に対応すると考えられる。]
+
+  - 横軸を固定した後、縦軸 $z_y$ を理想組織グラフについて各種構造指標と相関させると、コミュニティ数（サブチーム数）との相関が最も高い（Spearman 0.73、hub 除外時 0.63、x 軸との対照 0.19）。
+  - 型分離の相関比は $eta^2 = 0.77$ であり、5 つの理想型が統合的な型（hub・完全グラフ）と分断的な型（modular・階層・mentorship）の 3 群に分かれる（実データへの一般化には限界がある。6 節）。
 
   #figure(
-    image("assets/zy_by_type.png", width: 64%),
-    caption: [符号を揃えた型別 $z_y$。統合的（hub・完全グラフ, nc=1）が一方の端、分断的（modular/階層/mentorship, nc=2–3）が反対端。],
+    image("assets/zy_by_type.png", width: 60%),
+    caption: [符号を揃えた型別の $z_y$。統合的な型（hub・完全グラフ, nc=1）が一方の端、分断的な型（modular・階層・mentorship, nc=2–3）が他方の端に分かれる。],
   )
-
-  #text(size: 16pt, fill: tml-gray)[
-    ※ コミュニティ数＝modularity $Q$ 最大化分割のグループ数（$Q approx 0$ 塊なし／$Q > 0.3$ サブチームあり）。
-  ]
-
-  #highlight-box[
-    *y軸の解釈:* 上下は *組織のサブチームの個数（統合↔分断）* を示しているのではないか。
-    5 つの理想構造に注目すると、$z_y$ の値で 3 カテゴリに分けられる。
-  ]
 ]
 
-// Card 6: 限界・本丸の課題（陽 vs 潜在）
+// パネル6: 限界と今後の課題（陽 vs 潜在）
 #let sec-conclusion = [
-  *y軸解釈の限界:* 理想型限定。実組織は閾値1集計で *完全グラフ* に見え（密度 0.999, nc=1）転移しない（実データの $z_y$ は主にサイズ）。sym≥20 では密度 *0.700* で再解釈の余地。
+  #lead[1 軸の固定は陽な表現化に相当する。潜在表現を保ったまま方向へ解釈性を与えることが今後の課題である。]
 
-  *本丸の課題:* 1軸の固定は「特徴量を抽出してプロット」と同じで *潜在空間でなく陽な空間* になる。目指すのは *潜在のまま方向に解釈性を持たせる* こと。手段は (a) *補助変数* で潜在を一意に、(b) *後付け* で解釈軸を別途。
+  - y 軸の解釈は理想型に限定される。実組織は閾値 1 の集計では完全グラフに近く（密度 0.999、コミュニティ数 1）、解釈が一般化しない（実データの $z_y$ は主に組織規模に連動する）。辺の閾値を sym ≥ 20 とすると密度は 0.700 まで低下し、再解釈の余地が生じる。
+  - 1 軸を固定することは、グラフから特徴量を抽出して座標に配置することと等価であり、潜在表現ではなく陽な表現となる。目標は潜在表現を保ったまま方向へ解釈性を与えることである。
+  - 今後の方向として、(a) 補助変数により潜在を一意に定める手法、(b) 学習後に解釈軸を別途構成する手法が挙げられる。
 
   #highlight-box[
-    *一言で:* 指標を「見つけた」のではなく、損失で *軸に意味を与えた*。
-    x軸＝通信量変化（陽・連続・seed 安定）／ y軸＝統合↔分断（自由・カテゴリ）。
-    だが固定は陽化でもある——*潜在のまま方向を読む* のが次の本丸。
+    本研究は解釈に適した指標を発見したのではなく、損失設計により潜在軸へ意味を付与した点に特徴がある。
+    x 軸は通信量変化（陽・連続・seed 安定）に、y 軸は統合と分断（自由・カテゴリ的）に対応する。
   ]
 ]
