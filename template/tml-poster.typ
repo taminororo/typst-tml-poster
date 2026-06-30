@@ -155,26 +155,26 @@
 #let _make-header(title, subtitle, authors, affil) = block(
   width: 100%,
   fill: tml-blue,
-  inset: (x: 2cm, top: 1.0cm, bottom: 0cm),
+  inset: (x: 2cm, top: 0.6cm, bottom: 0cm),
   stack(
     grid(
-      columns: (9cm, 1fr, 9cm),
+      columns: (8cm, 1fr, 8cm),
       column-gutter: 1.0cm,
       align: horizon,
-      logo-card("../assets/logo-nut-white.png", bg: none, card-height: 6.5cm, card-width: 9cm),
+      logo-card("../assets/logo-nut-white.png", bg: none, card-height: 5.2cm, card-width: 8cm),
       align(center)[
-        #text(size: 40pt, weight: "bold", fill: white, title)
-        #v(0.3cm)
-        #text(size: 22pt, fill: rgb("#ccd6ee"), subtitle)
-        #v(0.25cm)
-        #text(size: 23pt, fill: white, authors)
-        #v(0.15cm)
-        #text(size: 18pt, fill: rgb("#a0b4cc"), affil)
+        #text(size: 34pt, weight: "bold", fill: white, title)
+        #v(0.2cm)
+        #text(size: 19pt, fill: rgb("#ccd6ee"), subtitle)
+        #v(0.18cm)
+        #text(size: 22pt, fill: white, authors)
+        #v(0.1cm)
+        #text(size: 17pt, fill: rgb("#a0b4cc"), affil)
       ],
-      logo-card("../assets/logo-tml-white.png", bg: none, card-height: 6.5cm, card-width: 9cm),
+      logo-card("../assets/logo-tml-white.png", bg: none, card-height: 5.2cm, card-width: 8cm),
     ),
-    v(0.7cm),
-    block(width: 100%, height: 0.5cm, fill: tml-accent),
+    v(0.45cm),
+    block(width: 100%, height: 0.4cm, fill: tml-accent),
   ),
 )
 
@@ -227,12 +227,17 @@
   show figure.caption: set text(size: 16pt, fill: tml-gray)
   set figure(supplement: [図])
 
-  place(top + left, hdr)
+  // フッターは下端に固定（フロー外）。
   place(bottom + left, ftr)
 
+  // ヘッダーを通常フローに置き、本文をその直後に流す。
+  // こうするとタイトルが複数行に折り返してもヘッダー高さに自動追従し、
+  // 本文がヘッダーに食い込まない（開始位置をハードコードしない）。
+  hdr
+  v(0.7cm)
   block(
     width: 100%,
-    inset: (x: 2cm, top: 10.8cm, bottom: 3.8cm),
+    inset: (x: 2cm, bottom: 3.4cm),
     body,
   )
 }
